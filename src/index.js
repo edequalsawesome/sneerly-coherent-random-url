@@ -11,6 +11,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	PanelColorSettings,
+	ContrastChecker,
 	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
 import { 
@@ -217,7 +218,12 @@ registerBlockType('sneerly-coherent/random-post-button', {
 								label: __('Text Color', 'sneerly-coherent-random'),
 							},
 						]}
-					/>
+					>
+						<ContrastChecker
+							backgroundColor={ backgroundColor }
+							textColor={ textColor }
+						/>
+					</PanelColorSettings>
 				</InspectorControls>
 				
 				{/* Button Preview */}
@@ -269,8 +275,11 @@ registerBlockType('sneerly-coherent/random-post-button', {
 			buttonWidth,
 		} = attributes;
 		
-		// Create link URL - either random or custom
-		const href = useRandomLink ? '?random=' + Date.now() : customLink;
+		// Create link URL - either random or custom.
+		// Must be deterministic: save() output is re-validated against stored
+		// markup on every editor load, so a Date.now() value here breaks block
+		// validation. The PHP render_callback appends the cache-buster anyway.
+		const href = useRandomLink ? '?random' : customLink;
 		
 		// Get button style
 		const buttonStyle = {

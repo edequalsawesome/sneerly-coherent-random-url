@@ -1,6 +1,6 @@
 {
   "name": "sneerly-coherent-random-post",
-  "version": "2.0.0",
+  "version": "2026.07.001",
   "description": "WordPress plugin for random post functionality with Gutenberg block",
   "main": "build/index.js",
   "scripts": {
@@ -15,7 +15,7 @@
     "build",
     "src",
     "sneerly-coherent-random-url.php",
-    "readme.txt"
+    "README.txt"
   ],
   "author": "eD! Thomas",
   "license": "GPL-2.0-or-later",
