@@ -1,0 +1,28 @@
+{
+  "name": "sneerly-coherent-random-post",
+  "version": "2.0.0",
+  "description": "WordPress plugin for random post functionality with Gutenberg block",
+  "main": "build/index.js",
+  "scripts": {
+    "start": "wp-scripts start",
+    "build": "wp-scripts build",
+    "format": "wp-scripts format",
+    "lint:js": "wp-scripts lint-js",
+    "lint:style": "wp-scripts lint-style",
+    "zip": "wp-scripts plugin-zip"
+  },
+  "files": [
+    "build",
+    "src",
+    "sneerly-coherent-random-url.php",
+    "readme.txt"
+  ],
+  "author": "eD! Thomas",
+  "license": "GPL-2.0-or-later",
+  "devDependencies": {
+    "@wordpress/scripts": "^30.7.0"
+  },
+  "dependencies": {
+    "@wordpress/icons": "^10.9.0"
+  }
+}
