@@ -1,0 +1,186 @@
+# Copyright (C) 2026 eD! Thomas
+# This file is distributed under the same license as the Sneerly Coherent Random Post plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: Sneerly Coherent Random Post 2026.08.001\n"
+"Report-Msgid-Bugs-To: https://github.com/edequalsawesome/sneerly-coherent-random-url/issues\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-08-24T02:35:19+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: sneerly-coherent-random\n"
+
+#. Plugin Name of the plugin
+#: sneerly-coherent-random-url.php
+msgid "Sneerly Coherent Random Post"
+msgstr ""
+
+#. Description of the plugin
+#: sneerly-coherent-random-url.php
+msgid "Redirects URLs with ?random parameter to a truly random post and adds a Gutenberg block for random post buttons"
+msgstr ""
+
+#. Author of the plugin
+#: sneerly-coherent-random-url.php
+msgid "eD! Thomas"
+msgstr ""
+
+#. Author URI of the plugin
+#: sneerly-coherent-random-url.php
+msgid "https://edequalsaweso.me"
+msgstr ""
+
+#: sneerly-coherent-random-url.php:407
+msgid "History cleared."
+msgstr ""
+
+#: sneerly-coherent-random-url.php:413
+msgid "General Settings"
+msgstr ""
+
+#: sneerly-coherent-random-url.php:432
+msgid "Post Types"
+msgstr ""
+
+#: sneerly-coherent-random-url.php:433
+msgid "Select which post types to include in random selection:"
+msgstr ""
+
+#: sneerly-coherent-random-url.php:438
+#: sneerly-coherent-random-url.php:443
+msgid "Include Post Types"
+msgstr ""
+
+#: sneerly-coherent-random-url.php:453
+msgid "Standard Posts"
+msgstr ""
+
+#: sneerly-coherent-random-url.php:458
+msgid "The random post selection will only include the checked post types."
+msgstr ""
+
+#. translators: %s: the build command to run, wrapped in a <code> tag.
+#: sneerly-coherent-random-url.php:589
+#, php-format
+msgid "Sneerly Coherent Random Post: Block editor assets not found. Please run %s in the plugin directory."
+msgstr ""
+
+#: src/index.js:37
+msgid "Random Post Button"
+msgstr ""
+
+#: src/index.js:38
+msgid "Add a button that links to a random post."
+msgstr ""
+
+#: src/index.js:48
+msgid "Read a Random Post"
+msgstr ""
+
+#: src/index.js:128
+msgid "Edit Link"
+msgstr ""
+
+#: src/index.js:129
+msgid "Close Link"
+msgstr ""
+
+#: src/index.js:139
+msgid "Link Settings"
+msgstr ""
+
+#: src/index.js:141
+msgid "Link to Random Post"
+msgstr ""
+
+#: src/index.js:146
+msgid "Button links to a random post on your site."
+msgstr ""
+
+#: src/index.js:147
+msgid "Button uses a custom link."
+msgstr ""
+
+#: src/index.js:154
+msgid "Type URL or paste..."
+msgstr ""
+
+#: src/index.js:168
+msgid "Open in new tab"
+msgstr ""
+
+#: src/index.js:175
+msgid "Button Settings"
+msgstr ""
+
+#: src/index.js:177
+msgid "Font Size"
+msgstr ""
+
+#: src/index.js:180
+msgid "Small"
+msgstr ""
+
+#: src/index.js:181
+msgid "Normal"
+msgstr ""
+
+#: src/index.js:182
+msgid "Medium"
+msgstr ""
+
+#: src/index.js:183
+msgid "Large"
+msgstr ""
+
+#: src/index.js:189
+msgid "Button Width"
+msgstr ""
+
+#: src/index.js:192
+msgid "Auto"
+msgstr ""
+
+#: src/index.js:193
+msgid "Full Width"
+msgstr ""
+
+#: src/index.js:199
+msgid "Border Radius"
+msgstr ""
+
+#: src/index.js:208
+msgid "Color Settings"
+msgstr ""
+
+#: src/index.js:213
+msgid "Background Color"
+msgstr ""
+
+#: src/index.js:218
+msgid "Text Color"
+msgstr ""
+
+#: src/index.js:233
+msgid "Add text…"
+msgstr ""
+
+#: src/index.js:246
+msgid "This button will link to a random post when clicked."
+msgstr ""
+
+#: src/index.js:250
+msgid "Custom link: "
+msgstr ""
+
+#: src/index.js:252
+msgid "opens in new tab"
+msgstr ""
+
+#: src/index.js:256
+msgid "No link set. Click the link button in the toolbar to add one."
+msgstr ""
