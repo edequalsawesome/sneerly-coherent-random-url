@@ -3,7 +3,7 @@ Contributors: edequalsawesome
 Donate link: https://edequalsaweso.me/
 Tags: random, posts, redirect, block, button
 Requires at least: 5.8
-Tested up to: 6.7
+Tested up to: 7.0
 Requires PHP: 7.4
 Stable tag: 2026.08.001
 License: GPLv2 or later
@@ -52,6 +52,19 @@ The `?random` request does nothing and the page loads normally.
 1. The Random Post Button block in the editor
 2. The settings page under Settings → Sneerly Coherent Random
 
+== Development ==
+
+Building requires Node. Releasing additionally requires [WP-CLI](https://wp-cli.org/) on your PATH, because the i18n steps shell out to `wp`:
+
+* `npm run build` — compile the block assets. Node only.
+* `npm run i18n:pot` — regenerate the translation template. Needs WP-CLI.
+* `npm run i18n:json` — build editor translation JSON from any .po files. Needs WP-CLI.
+* `npm run zip` — runs `i18n:json`, then packages the plugin. Needs WP-CLI.
+
+`npm run zip` will fail with `wp: command not found` if WP-CLI is missing. Contributors who only need to build assets can use `npm run build` and never touch WP-CLI.
+
+`i18n:json` passes `--use-map` so strings extracted from `src/index.js` are emitted under the hash of `build/index.js`, which is the filename WordPress actually looks up. The argument is single-quoted deliberately: npm runs scripts through `sh`, which would otherwise strip the inner quotes and hand WP-CLI invalid JSON.
+
 == Changelog ==
 
 = 2026.08.001 =
@@ -86,6 +99,9 @@ Known limitation: several settings-page strings (History Size, the Usage and His
 * Previous release (version history before 2026.07.001 was untracked)
 
 == Upgrade Notice ==
+
+= 2026.08.001 =
+Makes the plugin translatable. Translations could never load before this release. No translations ship with it yet, so English-language sites see no change.
 
 = 2026.07.001 =
 Fixes editor block validation errors, a broken Clear History button, and a serious query performance problem on large sites. Recommended for all users.
