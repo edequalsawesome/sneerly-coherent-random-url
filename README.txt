@@ -5,7 +5,7 @@ Tags: random, posts, redirect, block, button
 Requires at least: 5.8
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2026.07.001
+Stable tag: 2026.08.001
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,19 @@ The `?random` request does nothing and the page loads normally.
 2. The settings page under Settings → Sneerly Coherent Random
 
 == Changelog ==
+
+= 2026.08.001 =
+* Fixed: translations could never load — the plugin header declared the text domain `sneer-campaign-random` while every translation call in PHP and JavaScript used `sneerly-coherent-random`
+* Fixed: the plugin never called load_plugin_textdomain(), so bundled translations were not loaded even once the domain matched
+* Fixed: block editor strings had no translation hand-off; wp_set_script_translations() is now wired to the editor script
+* Fixed: the "Block editor assets not found" admin notice was never wrapped for translation
+* Fixed: the generated right-to-left editor stylesheet was never served, because the style was not tagged for RTL replacement
+* Added: a translation template at languages/sneerly-coherent-random.pot, shipped with the plugin
+* Added: `npm run i18n:pot` and `npm run i18n:json` release steps; `npm run zip` now regenerates editor translation JSON before packaging
+
+Note: this release makes translation *possible* — it does not ship any translations. No locale is translated until a .po/.mo is contributed.
+
+Known limitation: several settings-page strings (History Size, the Usage and History sections, Clear History) are still not wrapped for translation and are absent from the .pot. That sweep is a follow-up.
 
 = 2026.07.001 =
 * Fixed: block validation error ("unexpected or invalid content") every time a post containing the Random Post Button was reopened in the editor
