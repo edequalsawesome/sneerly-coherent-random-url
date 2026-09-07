@@ -31,7 +31,7 @@ Features:
 1. Upload the `sneerly-coherent-random-url` folder to the `/wp-content/plugins/` directory
 1. Activate the plugin through the 'Plugins' menu in WordPress
 1. Configure history size and post types under Settings → Sneerly Coherent Random
-1. Add `?random` to any URL, or insert the "Random Post Button" block in your content
+1. Add `?random` to any frontend URL, or insert the "Random Post Button" block in your content
 
 == Frequently Asked Questions ==
 
@@ -53,6 +53,11 @@ The `?random` request does nothing and the page loads normally.
 2. The settings page under Settings → Sneerly Coherent Random
 
 == Changelog ==
+
+= Unreleased =
+* Fixed: random redirects wait for late-registered post types and leave destination URLs cacheable
+* Improved: random redirects leave the request alone when no eligible post exists, its permalink cannot be resolved, or a redirect filter cancels the redirect
+* Changed: random redirects run on frontend requests only; REST and login requests no longer redirect
 
 = 2026.07.001 =
 * Fixed: block validation error ("unexpected or invalid content") every time a post containing the Random Post Button was reopened in the editor

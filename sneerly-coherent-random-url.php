@@ -66,8 +66,9 @@ class Sneerly_Coherent_Random_Post {
 	 * Initialize the plugin
 	 */
 	public function __construct() {
-		// Hook into WordPress initialization for redirection
-		add_action('init', array($this, 'check_for_random_parameter'));
+		// Redirect after every plugin has registered its post types, before
+		// core's canonical redirect can alter the random endpoint.
+		add_action('template_redirect', array($this, 'check_for_random_parameter'), 0);
 		
 		// Add settings page
 		add_action('admin_menu', array($this, 'add_admin_menu'));
@@ -131,22 +132,20 @@ class Sneerly_Coherent_Random_Post {
 			return;
 		}
 
-		// Create a cache-busting value for the destination URL.
-		// Use the provided cb value if available, otherwise generate a new one.
-		$unique_cache_buster = (isset($_GET['cb']) && is_string($_GET['cb'])) ?
-			sanitize_text_field(wp_unslash($_GET['cb'])) . '_' . mt_rand(1000, 9999) :
-			time() . '_' . mt_rand(1000, 9999);
-
 		// Get random post
 		$random_post = $this->get_random_post();
 
 		// If we found a post, redirect to it
 		if ($random_post) {
-			$redirect_url = add_query_arg('nocache', $unique_cache_buster, get_permalink($random_post->ID));
+			$redirect_url = get_permalink($random_post->ID);
+			if (!$redirect_url) {
+				return;
+			}
 
 			nocache_headers();
-			wp_safe_redirect($redirect_url);
-			exit;
+			if (wp_safe_redirect($redirect_url)) {
+				exit;
+			}
 		}
 	}
 
@@ -464,7 +463,7 @@ class Sneerly_Coherent_Random_Post {
 			<p>There are two ways to use the random post feature:</p>
 			
 			<h3>1. URL Parameter</h3>
-			<p>Add <code>?random</code> to any URL on your site to redirect to a random post.</p>
+			<p>Add <code>?random</code> to any frontend URL on your site to redirect to a random post.</p>
 			<p>Example: <code><?php echo esc_url(site_url('/?random')); ?></code></p>
 			
 			<h3>2. Gutenberg Block</h3>
