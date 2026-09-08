@@ -44,8 +44,8 @@ class Sneerly_Coherent_Random_Post {
 	 */
 	private $default_post_types = array('post');
 
-	/** @var bool Whether the current selection starts a new history cycle. */
-	private $reset_history_after_redirect = false;
+	/** @var array|null Exhausted history observed when selecting a new cycle. */
+	private $history_to_reset = null;
 	
 	/**
 	 * Get user-specific transient name
@@ -163,7 +163,7 @@ class Sneerly_Coherent_Random_Post {
 	 * @return \WP_Post|null Post object if successful, null otherwise
 	 */
 	private function get_random_post() {
-		$this->reset_history_after_redirect = false;
+		$this->history_to_reset = null;
 		// Get enabled post types
 		$enabled_post_types = get_option('sneerly_coherent_post_types', $this->default_post_types);
 		if (!is_array($enabled_post_types) || empty($enabled_post_types)) {
@@ -189,8 +189,8 @@ class Sneerly_Coherent_Random_Post {
 		// Every eligible post has been shown recently — retry without exclusions.
 		// Persist the new cycle only after a successful redirect.
 		if ($eligible_count <= 0 && !empty($post_history)) {
+			$this->history_to_reset = $post_history;
 			$post_history = array();
-			$this->reset_history_after_redirect = true;
 			$eligible_count = $this->count_eligible_posts($enabled_post_types, $post_history);
 		}
 
@@ -265,8 +265,27 @@ class Sneerly_Coherent_Random_Post {
 	 * @return void
 	 */
 	private function add_to_history($post_id) {
+		// Selection cached history earlier; refresh before recording another success.
+		$key = $this->get_user_transient_name();
+		if (wp_using_ext_object_cache() || wp_installing()) {
+			wp_cache_get($key, 'transient', true);
+		} else {
+			$cache_keys = array('_transient_' . $key, '_transient_timeout_' . $key);
+			$notoptions = wp_cache_get('notoptions', 'options');
+			foreach ($cache_keys as $cache_key) {
+				// A stale timeout could otherwise delete a concurrently refreshed value.
+				wp_cache_delete($cache_key, 'options');
+				if (is_array($notoptions)) {
+					unset($notoptions[$cache_key]);
+				}
+			}
+			if (is_array($notoptions)) {
+				wp_cache_set('notoptions', $notoptions, 'options');
+			}
+		}
+		// ponytail: history is best effort; atomic storage is needed for strict concurrent no-repeat guarantees.
 		$history = $this->get_post_history();
-		if ($this->reset_history_after_redirect) {
+		if ($history === $this->history_to_reset) {
 			$history = array();
 		}
 		
