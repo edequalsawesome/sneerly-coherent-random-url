@@ -1,6 +1,6 @@
 {
   "name": "sneerly-coherent-random-post",
-  "version": "2026.07.001",
+  "version": "2026.08.001",
   "description": "WordPress plugin for random post functionality with Gutenberg block",
   "main": "build/index.js",
   "scripts": {
@@ -9,10 +9,13 @@
     "format": "wp-scripts format",
     "lint:js": "wp-scripts lint-js",
     "lint:style": "wp-scripts lint-style",
-    "zip": "wp-scripts plugin-zip"
+    "zip": "npm run i18n:json && wp-scripts plugin-zip",
+    "i18n:pot": "wp i18n make-pot . languages/sneerly-coherent-random.pot --domain=sneerly-coherent-random --exclude=node_modules,build",
+    "i18n:json": "wp i18n make-json languages --no-purge '--use-map={\"src/index.js\":\"build/index.js\"}'"
   },
   "files": [
     "build",
+    "languages",
     "src",
     "sneerly-coherent-random-url.php",
     "README.txt"

@@ -2,10 +2,11 @@
 /**
  * Plugin Name: Sneerly Coherent Random Post
  * Description: Redirects URLs with ?random parameter to a truly random post and adds a Gutenberg block for random post buttons
- * Version: 2026.07.001
+ * Version: 2026.08.001
  * Author: eD! Thomas
  * Author URI: https://edequalsaweso.me
- * Text Domain: sneer-campaign-random
+ * Text Domain: sneerly-coherent-random
+ * Domain Path: /languages
  * Requires at least: 5.8
  * Requires PHP: 7.4
  */
@@ -16,7 +17,7 @@ if (!defined('WPINC')) {
 }
 
 // Define plugin constants
-define('SNEERLY_COHERENT_RANDOM_VERSION', '2026.07.001');
+define('SNEERLY_COHERENT_RANDOM_VERSION', '2026.08.001');
 define('SNEERLY_COHERENT_RANDOM_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SNEERLY_COHERENT_RANDOM_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -69,6 +70,10 @@ class Sneerly_Coherent_Random_Post {
 	 * Initialize the plugin
 	 */
 	public function __construct() {
+		// Load translations. Hooked to init rather than plugins_loaded so
+		// WP 6.7+ doesn't emit a _load_textdomain_just_in_time notice.
+		add_action('init', array($this, 'load_textdomain'));
+
 		// Redirect after every plugin has registered its post types, before
 		// core's canonical redirect can alter the random endpoint.
 		add_action('template_redirect', array($this, 'check_for_random_parameter'), 0);
@@ -501,6 +506,22 @@ class Sneerly_Coherent_Random_Post {
 	}
 	
 	/**
+	 * Load the plugin text domain.
+	 *
+	 * The domain must match the Text Domain header and every __() call in
+	 * both PHP and JS, or WordPress looks for .mo files that never exist.
+	 *
+	 * @return void
+	 */
+	public function load_textdomain() {
+		load_plugin_textdomain(
+			'sneerly-coherent-random',
+			false,
+			dirname(plugin_basename(__FILE__)) . '/languages'
+		);
+	}
+
+	/**
 	 * Register the Gutenberg block
 	 * @return void
 	 */
@@ -568,7 +589,11 @@ class Sneerly_Coherent_Random_Post {
 			// If build files don't exist, show admin notice
 			add_action('admin_notices', function() {
 				echo '<div class="notice notice-error"><p>';
-				echo 'Sneerly Coherent Random Post: Block editor assets not found. Please run <code>npm run build</code> in the plugin directory.';
+				printf(
+					/* translators: %s: the build command to run, wrapped in a <code> tag. */
+					esc_html__('Sneerly Coherent Random Post: Block editor assets not found. Please run %s in the plugin directory.', 'sneerly-coherent-random'),
+					'<code>npm run build</code>'
+				);
 				echo '</p></div>';
 			});
 			return;
@@ -588,6 +613,14 @@ class Sneerly_Coherent_Random_Post {
 			filemtime($script_path),
 			true
 		);
+
+		// The block's editor strings live in JS, so they need this in addition
+		// to load_plugin_textdomain() — wp.i18n otherwise renders the English source.
+		wp_set_script_translations(
+			'sneerly-coherent-random-button-editor',
+			'sneerly-coherent-random',
+			SNEERLY_COHERENT_RANDOM_PLUGIN_DIR . 'languages'
+		);
 		
 		// Register the style if it exists
 		if (file_exists($style_path)) {
@@ -597,6 +630,10 @@ class Sneerly_Coherent_Random_Post {
 				array(),
 				filemtime($style_path)
 			);
+
+			// Without this, core serves index.css to RTL locales too and the
+			// generated index-rtl.css is dead weight.
+			wp_style_add_data('sneerly-coherent-random-button-editor-style', 'rtl', 'replace');
 		}
 	}
 	
