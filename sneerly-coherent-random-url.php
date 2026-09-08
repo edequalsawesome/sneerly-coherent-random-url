@@ -42,6 +42,9 @@ class Sneerly_Coherent_Random_Post {
 	 * @var array
 	 */
 	private $default_post_types = array('post');
+
+	/** @var bool Whether the current selection starts a new history cycle. */
+	private $reset_history_after_redirect = false;
 	
 	/**
 	 * Get user-specific transient name
@@ -144,6 +147,7 @@ class Sneerly_Coherent_Random_Post {
 
 			nocache_headers();
 			if (wp_safe_redirect($redirect_url)) {
+				$this->add_to_history($random_post->ID);
 				exit;
 			}
 		}
@@ -154,6 +158,7 @@ class Sneerly_Coherent_Random_Post {
 	 * @return \WP_Post|null Post object if successful, null otherwise
 	 */
 	private function get_random_post() {
+		$this->reset_history_after_redirect = false;
 		// Get enabled post types
 		$enabled_post_types = get_option('sneerly_coherent_post_types', $this->default_post_types);
 		if (!is_array($enabled_post_types) || empty($enabled_post_types)) {
@@ -176,10 +181,11 @@ class Sneerly_Coherent_Random_Post {
 		$post_history = $this->get_post_history();
 		$eligible_count = $this->count_eligible_posts($enabled_post_types, $post_history);
 
-		// Every eligible post has been shown recently — reset history.
+		// Every eligible post has been shown recently — retry without exclusions.
+		// Persist the new cycle only after a successful redirect.
 		if ($eligible_count <= 0 && !empty($post_history)) {
 			$post_history = array();
-			$this->update_post_history($post_history);
+			$this->reset_history_after_redirect = true;
 			$eligible_count = $this->count_eligible_posts($enabled_post_types, $post_history);
 		}
 
@@ -211,10 +217,7 @@ class Sneerly_Coherent_Random_Post {
 			return null;
 		}
 
-		$post = $random_query->posts[0];
-		$this->add_to_history($post->ID);
-
-		return $post;
+		return $random_query->posts[0];
 	}
 
 	/**
@@ -258,6 +261,9 @@ class Sneerly_Coherent_Random_Post {
 	 */
 	private function add_to_history($post_id) {
 		$history = $this->get_post_history();
+		if ($this->reset_history_after_redirect) {
+			$history = array();
+		}
 		
 		// Add new post ID to the beginning of the array
 		array_unshift($history, (int)$post_id);
