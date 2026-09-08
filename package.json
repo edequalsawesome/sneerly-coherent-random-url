@@ -10,8 +10,9 @@
     "lint:js": "wp-scripts lint-js",
     "lint:style": "wp-scripts lint-style",
     "zip": "npm run i18n:json && wp-scripts plugin-zip",
-    "i18n:pot": "wp i18n make-pot . languages/sneerly-coherent-random.pot --domain=sneerly-coherent-random --exclude=node_modules,build",
-    "i18n:json": "wp i18n make-json languages --no-purge '--use-map={\"src/index.js\":\"build/index.js\"}'"
+    "i18n:pot": "wp i18n make-pot . languages/sneerly-coherent-random.pot --domain=sneerly-coherent-random --exclude=node_modules,build,tests --headers=\"{\\\"Report-Msgid-Bugs-To\\\":\\\"https://github.com/edequalsawesome/sneerly-coherent-random-url/issues\\\"}\"",
+    "i18n:json": "wp i18n make-json languages --no-purge --use-map=\"{\\\"src/index.js\\\":\\\"build/index.js\\\"}\"",
+    "plugin-zip": "npm run zip --"
   },
   "files": [
     "build",

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-24T02:35:19+00:00\n"
+"POT-Creation-Date: 2026-09-08T02:12:50+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: sneerly-coherent-random\n"
@@ -34,37 +34,109 @@ msgstr ""
 msgid "https://edequalsaweso.me"
 msgstr ""
 
-#: sneerly-coherent-random-url.php:407
+#: sneerly-coherent-random-url.php:323
+msgid "Sneerly Coherent Random Post Settings"
+msgstr ""
+
+#: sneerly-coherent-random-url.php:324
+msgid "Sneerly Coherent Random"
+msgstr ""
+
+#: sneerly-coherent-random-url.php:431
 msgid "History cleared."
 msgstr ""
 
-#: sneerly-coherent-random-url.php:413
+#: sneerly-coherent-random-url.php:437
 msgid "General Settings"
 msgstr ""
 
-#: sneerly-coherent-random-url.php:432
+#: sneerly-coherent-random-url.php:441
+msgid "History Size"
+msgstr ""
+
+#: sneerly-coherent-random-url.php:450
+msgid "Number of posts to remember and avoid repeating. Higher values prevent more repetition."
+msgstr ""
+
+#: sneerly-coherent-random-url.php:456
 msgid "Post Types"
 msgstr ""
 
-#: sneerly-coherent-random-url.php:433
+#: sneerly-coherent-random-url.php:457
 msgid "Select which post types to include in random selection:"
 msgstr ""
 
-#: sneerly-coherent-random-url.php:438
-#: sneerly-coherent-random-url.php:443
+#: sneerly-coherent-random-url.php:462
+#: sneerly-coherent-random-url.php:467
 msgid "Include Post Types"
 msgstr ""
 
-#: sneerly-coherent-random-url.php:453
+#: sneerly-coherent-random-url.php:477
 msgid "Standard Posts"
 msgstr ""
 
-#: sneerly-coherent-random-url.php:458
+#: sneerly-coherent-random-url.php:482
 msgid "The random post selection will only include the checked post types."
 msgstr ""
 
+#: sneerly-coherent-random-url.php:492
+msgid "Usage"
+msgstr ""
+
+#: sneerly-coherent-random-url.php:493
+msgid "There are two ways to use the random post feature:"
+msgstr ""
+
+#: sneerly-coherent-random-url.php:495
+msgid "1. URL Parameter"
+msgstr ""
+
+#. translators: %s: the ?random URL parameter, wrapped in a <code> tag.
+#: sneerly-coherent-random-url.php:498
+#, php-format
+msgid "Add %s to any frontend URL on your site to redirect to a random post."
+msgstr ""
+
+#: sneerly-coherent-random-url.php:500
+msgid "Example:"
+msgstr ""
+
+#: sneerly-coherent-random-url.php:502
+msgid "2. Gutenberg Block"
+msgstr ""
+
+#: sneerly-coherent-random-url.php:503
+msgid "Use the “Random Post Button” block in the editor to add a stylish button that links to a random post."
+msgstr ""
+
+#: sneerly-coherent-random-url.php:504
+msgid "Simply search for “random” in the block inserter and customize the button to your liking."
+msgstr ""
+
+#: sneerly-coherent-random-url.php:506
+msgid "History"
+msgstr ""
+
+#. translators: %d: the configured number of recently shown posts to remember.
+#: sneerly-coherent-random-url.php:509
+#, php-format
+msgid "Recent-history limit: %d. Posts in recent history are excluded while another eligible post is available."
+msgstr ""
+
+#: sneerly-coherent-random-url.php:514
+msgid "Recently shown posts:"
+msgstr ""
+
+#: sneerly-coherent-random-url.php:524
+msgid "Clear History"
+msgstr ""
+
+#: sneerly-coherent-random-url.php:526
+msgid "No posts have been shown yet."
+msgstr ""
+
 #. translators: %s: the build command to run, wrapped in a <code> tag.
-#: sneerly-coherent-random-url.php:589
+#: sneerly-coherent-random-url.php:619
 #, php-format
 msgid "Sneerly Coherent Random Post: Block editor assets not found. Please run %s in the plugin directory."
 msgstr ""

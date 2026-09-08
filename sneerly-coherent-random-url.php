@@ -43,6 +43,9 @@ class Sneerly_Coherent_Random_Post {
 	 * @var array
 	 */
 	private $default_post_types = array('post');
+
+	/** @var array|null Exhausted history observed when selecting a new cycle. */
+	private $history_to_reset = null;
 	
 	/**
 	 * Get user-specific transient name
@@ -71,8 +74,9 @@ class Sneerly_Coherent_Random_Post {
 		// WP 6.7+ doesn't emit a _load_textdomain_just_in_time notice.
 		add_action('init', array($this, 'load_textdomain'));
 
-		// Hook into WordPress initialization for redirection
-		add_action('init', array($this, 'check_for_random_parameter'));
+		// Redirect after every plugin has registered its post types, before
+		// core's canonical redirect can alter the random endpoint.
+		add_action('template_redirect', array($this, 'check_for_random_parameter'), 0);
 		
 		// Add settings page
 		add_action('admin_menu', array($this, 'add_admin_menu'));
@@ -136,22 +140,21 @@ class Sneerly_Coherent_Random_Post {
 			return;
 		}
 
-		// Create a cache-busting value for the destination URL.
-		// Use the provided cb value if available, otherwise generate a new one.
-		$unique_cache_buster = (isset($_GET['cb']) && is_string($_GET['cb'])) ?
-			sanitize_text_field(wp_unslash($_GET['cb'])) . '_' . mt_rand(1000, 9999) :
-			time() . '_' . mt_rand(1000, 9999);
-
 		// Get random post
 		$random_post = $this->get_random_post();
 
 		// If we found a post, redirect to it
 		if ($random_post) {
-			$redirect_url = add_query_arg('nocache', $unique_cache_buster, get_permalink($random_post->ID));
+			$redirect_url = get_permalink($random_post->ID);
+			if (!$redirect_url) {
+				return;
+			}
 
 			nocache_headers();
-			wp_safe_redirect($redirect_url);
-			exit;
+			if (wp_safe_redirect($redirect_url)) {
+				$this->add_to_history($random_post->ID);
+				exit;
+			}
 		}
 	}
 
@@ -160,6 +163,7 @@ class Sneerly_Coherent_Random_Post {
 	 * @return \WP_Post|null Post object if successful, null otherwise
 	 */
 	private function get_random_post() {
+		$this->history_to_reset = null;
 		// Get enabled post types
 		$enabled_post_types = get_option('sneerly_coherent_post_types', $this->default_post_types);
 		if (!is_array($enabled_post_types) || empty($enabled_post_types)) {
@@ -182,10 +186,11 @@ class Sneerly_Coherent_Random_Post {
 		$post_history = $this->get_post_history();
 		$eligible_count = $this->count_eligible_posts($enabled_post_types, $post_history);
 
-		// Every eligible post has been shown recently — reset history.
+		// Every eligible post has been shown recently — retry without exclusions.
+		// Persist the new cycle only after a successful redirect.
 		if ($eligible_count <= 0 && !empty($post_history)) {
+			$this->history_to_reset = $post_history;
 			$post_history = array();
-			$this->update_post_history($post_history);
 			$eligible_count = $this->count_eligible_posts($enabled_post_types, $post_history);
 		}
 
@@ -217,10 +222,7 @@ class Sneerly_Coherent_Random_Post {
 			return null;
 		}
 
-		$post = $random_query->posts[0];
-		$this->add_to_history($post->ID);
-
-		return $post;
+		return $random_query->posts[0];
 	}
 
 	/**
@@ -263,7 +265,29 @@ class Sneerly_Coherent_Random_Post {
 	 * @return void
 	 */
 	private function add_to_history($post_id) {
+		// Selection cached history earlier; refresh before recording another success.
+		$key = $this->get_user_transient_name();
+		if (wp_using_ext_object_cache() || wp_installing()) {
+			wp_cache_get($key, 'transient', true);
+		} else {
+			$cache_keys = array('_transient_' . $key, '_transient_timeout_' . $key);
+			$notoptions = wp_cache_get('notoptions', 'options');
+			foreach ($cache_keys as $cache_key) {
+				// A stale timeout could otherwise delete a concurrently refreshed value.
+				wp_cache_delete($cache_key, 'options');
+				if (is_array($notoptions)) {
+					unset($notoptions[$cache_key]);
+				}
+			}
+			if (is_array($notoptions)) {
+				wp_cache_set('notoptions', $notoptions, 'options');
+			}
+		}
+		// ponytail: history is best effort; atomic storage is needed for strict concurrent no-repeat guarantees.
 		$history = $this->get_post_history();
+		if ($history === $this->history_to_reset) {
+			$history = array();
+		}
 		
 		// Add new post ID to the beginning of the array
 		array_unshift($history, (int)$post_id);
@@ -296,8 +320,8 @@ class Sneerly_Coherent_Random_Post {
 	 */
 	public function add_admin_menu() {
 		add_options_page(
-			'Sneerly Coherent Random Post Settings',
-			'Sneerly Coherent Random',
+			__( 'Sneerly Coherent Random Post Settings', 'sneerly-coherent-random' ),
+			__( 'Sneerly Coherent Random', 'sneerly-coherent-random' ),
 			'manage_options',
 			'sneerly-coherent-random',
 			array($this, 'render_settings_page')
@@ -414,7 +438,7 @@ class Sneerly_Coherent_Random_Post {
 				<table class="form-table">
 					<tr>
 						<th scope="row">
-							<label for="sneerly_coherent_history_limit">History Size</label>
+							<label for="sneerly_coherent_history_limit"><?php esc_html_e('History Size', 'sneerly-coherent-random'); ?></label>
 						</th>
 						<td>
 							<input type="number" id="sneerly_coherent_history_limit"
@@ -423,7 +447,7 @@ class Sneerly_Coherent_Random_Post {
 								   min="1" max="100"
 								   aria-describedby="sneerly_coherent_history_limit_description" />
 							<p class="description" id="sneerly_coherent_history_limit_description">
-								Number of posts to remember and avoid repeating. Higher values prevent more repetition.
+								<?php esc_html_e('Number of posts to remember and avoid repeating. Higher values prevent more repetition.', 'sneerly-coherent-random'); ?>
 							</p>
 						</td>
 					</tr>
@@ -465,23 +489,29 @@ class Sneerly_Coherent_Random_Post {
 				<?php submit_button(); ?>
 			</form>
 			
-			<h2>Usage</h2>
-			<p>There are two ways to use the random post feature:</p>
+			<h2><?php esc_html_e('Usage', 'sneerly-coherent-random'); ?></h2>
+			<p><?php esc_html_e('There are two ways to use the random post feature:', 'sneerly-coherent-random'); ?></p>
 			
-			<h3>1. URL Parameter</h3>
-			<p>Add <code>?random</code> to any URL on your site to redirect to a random post.</p>
-			<p>Example: <code><?php echo esc_url(site_url('/?random')); ?></code></p>
+			<h3><?php esc_html_e('1. URL Parameter', 'sneerly-coherent-random'); ?></h3>
+			<p><?php
+				/* translators: %s: the ?random URL parameter, wrapped in a <code> tag. */
+				printf(esc_html__('Add %s to any frontend URL on your site to redirect to a random post.', 'sneerly-coherent-random'), '<code>?random</code>');
+			?></p>
+			<p><?php esc_html_e('Example:', 'sneerly-coherent-random'); ?> <code><?php echo esc_url(site_url('/?random')); ?></code></p>
 			
-			<h3>2. Gutenberg Block</h3>
-			<p>Use the "Random Post Button" block in the editor to add a stylish button that links to a random post.</p>
-			<p>Simply search for "random" in the block inserter and customize the button to your liking.</p>
+			<h3><?php esc_html_e('2. Gutenberg Block', 'sneerly-coherent-random'); ?></h3>
+			<p><?php esc_html_e('Use the “Random Post Button” block in the editor to add a stylish button that links to a random post.', 'sneerly-coherent-random'); ?></p>
+			<p><?php esc_html_e('Simply search for “random” in the block inserter and customize the button to your liking.', 'sneerly-coherent-random'); ?></p>
 			
-			<h2>History</h2>
-			<p>Sneerly Coherent Random Post will avoid showing the same post twice until <?php echo esc_html($history_limit); ?> different posts have been shown.</p>
+			<h2><?php esc_html_e('History', 'sneerly-coherent-random'); ?></h2>
+			<p><?php
+				/* translators: %d: the configured number of recently shown posts to remember. */
+				printf(esc_html__('Recent-history limit: %d. Posts in recent history are excluded while another eligible post is available.', 'sneerly-coherent-random'), esc_html($history_limit));
+			?></p>
 			<?php
 			$history = $this->get_post_history();
 			if (!empty($history)) {
-				echo '<h3>Recently shown posts:</h3>';
+				echo '<h3>' . esc_html__('Recently shown posts:', 'sneerly-coherent-random') . '</h3>';
 				echo '<ol>';
 				foreach ($history as $post_id) {
 					$title = get_the_title($post_id);
@@ -491,9 +521,9 @@ class Sneerly_Coherent_Random_Post {
 				echo '</ol>';
 				
 				echo '<p><a href="' . esc_url(wp_nonce_url(add_query_arg('clear_history', '1'), 'sneerly_clear_history')) .
-					 '" class="button">Clear History</a></p>';
+					 '" class="button">' . esc_html__('Clear History', 'sneerly-coherent-random') . '</a></p>';
 			} else {
-				echo '<p>No posts have been shown yet.</p>';
+				echo '<p>' . esc_html__('No posts have been shown yet.', 'sneerly-coherent-random') . '</p>';
 			}
 			?>
 		</div>
