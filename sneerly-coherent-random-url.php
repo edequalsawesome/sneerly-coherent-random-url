@@ -320,8 +320,8 @@ class Sneerly_Coherent_Random_Post {
 	 */
 	public function add_admin_menu() {
 		add_options_page(
-			'Sneerly Coherent Random Post Settings',
-			'Sneerly Coherent Random',
+			__( 'Sneerly Coherent Random Post Settings', 'sneerly-coherent-random' ),
+			__( 'Sneerly Coherent Random', 'sneerly-coherent-random' ),
 			'manage_options',
 			'sneerly-coherent-random',
 			array($this, 'render_settings_page')
@@ -438,7 +438,7 @@ class Sneerly_Coherent_Random_Post {
 				<table class="form-table">
 					<tr>
 						<th scope="row">
-							<label for="sneerly_coherent_history_limit">History Size</label>
+							<label for="sneerly_coherent_history_limit"><?php esc_html_e('History Size', 'sneerly-coherent-random'); ?></label>
 						</th>
 						<td>
 							<input type="number" id="sneerly_coherent_history_limit"
@@ -447,7 +447,7 @@ class Sneerly_Coherent_Random_Post {
 								   min="1" max="100"
 								   aria-describedby="sneerly_coherent_history_limit_description" />
 							<p class="description" id="sneerly_coherent_history_limit_description">
-								Number of posts to remember and avoid repeating. Higher values prevent more repetition.
+								<?php esc_html_e('Number of posts to remember and avoid repeating. Higher values prevent more repetition.', 'sneerly-coherent-random'); ?>
 							</p>
 						</td>
 					</tr>
@@ -489,23 +489,29 @@ class Sneerly_Coherent_Random_Post {
 				<?php submit_button(); ?>
 			</form>
 			
-			<h2>Usage</h2>
-			<p>There are two ways to use the random post feature:</p>
+			<h2><?php esc_html_e('Usage', 'sneerly-coherent-random'); ?></h2>
+			<p><?php esc_html_e('There are two ways to use the random post feature:', 'sneerly-coherent-random'); ?></p>
 			
-			<h3>1. URL Parameter</h3>
-			<p>Add <code>?random</code> to any frontend URL on your site to redirect to a random post.</p>
-			<p>Example: <code><?php echo esc_url(site_url('/?random')); ?></code></p>
+			<h3><?php esc_html_e('1. URL Parameter', 'sneerly-coherent-random'); ?></h3>
+			<p><?php
+				/* translators: %s: the ?random URL parameter, wrapped in a <code> tag. */
+				printf(esc_html__('Add %s to any frontend URL on your site to redirect to a random post.', 'sneerly-coherent-random'), '<code>?random</code>');
+			?></p>
+			<p><?php esc_html_e('Example:', 'sneerly-coherent-random'); ?> <code><?php echo esc_url(site_url('/?random')); ?></code></p>
 			
-			<h3>2. Gutenberg Block</h3>
-			<p>Use the "Random Post Button" block in the editor to add a stylish button that links to a random post.</p>
-			<p>Simply search for "random" in the block inserter and customize the button to your liking.</p>
+			<h3><?php esc_html_e('2. Gutenberg Block', 'sneerly-coherent-random'); ?></h3>
+			<p><?php esc_html_e('Use the “Random Post Button” block in the editor to add a stylish button that links to a random post.', 'sneerly-coherent-random'); ?></p>
+			<p><?php esc_html_e('Simply search for “random” in the block inserter and customize the button to your liking.', 'sneerly-coherent-random'); ?></p>
 			
-			<h2>History</h2>
-			<p>Sneerly Coherent Random Post will avoid showing the same post twice until <?php echo esc_html($history_limit); ?> different posts have been shown.</p>
+			<h2><?php esc_html_e('History', 'sneerly-coherent-random'); ?></h2>
+			<p><?php
+				/* translators: %d: the configured number of recently shown posts to remember. */
+				printf(esc_html__('Recent-history limit: %d. Posts in recent history are excluded while another eligible post is available.', 'sneerly-coherent-random'), esc_html($history_limit));
+			?></p>
 			<?php
 			$history = $this->get_post_history();
 			if (!empty($history)) {
-				echo '<h3>Recently shown posts:</h3>';
+				echo '<h3>' . esc_html__('Recently shown posts:', 'sneerly-coherent-random') . '</h3>';
 				echo '<ol>';
 				foreach ($history as $post_id) {
 					$title = get_the_title($post_id);
@@ -515,9 +521,9 @@ class Sneerly_Coherent_Random_Post {
 				echo '</ol>';
 				
 				echo '<p><a href="' . esc_url(wp_nonce_url(add_query_arg('clear_history', '1'), 'sneerly_clear_history')) .
-					 '" class="button">Clear History</a></p>';
+					 '" class="button">' . esc_html__('Clear History', 'sneerly-coherent-random') . '</a></p>';
 			} else {
-				echo '<p>No posts have been shown yet.</p>';
+				echo '<p>' . esc_html__('No posts have been shown yet.', 'sneerly-coherent-random') . '</p>';
 			}
 			?>
 		</div>

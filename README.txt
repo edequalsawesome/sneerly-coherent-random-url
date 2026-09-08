@@ -22,7 +22,7 @@ Two ways to use it:
 
 Features:
 
-*   Remembers recently shown posts per visitor (configurable history size, 1-100) so people don't land on the same post twice in a row.
+*   Remembers recently shown posts per visitor (configurable history size, 1-100) to reduce repetition while other eligible posts are available.
 *   Choose which public post types are included in the random selection.
 *   Plays nicely with caching plugins: the redirect request sets the standard `DONOTCACHEPAGE`/`DONOTCACHEOBJECT`/`DONOTCACHEDB` constants and sends no-cache headers, while destination pages stay fully cacheable.
 
@@ -37,7 +37,7 @@ Features:
 
 = Does the same visitor see repeats? =
 
-Not until they've cycled through the configured history size (default 10 posts). History is remembered per logged-in user, or per hashed IP address for anonymous visitors, for one hour.
+The plugin keeps a recent history up to the configured size (default 10 posts) and excludes those posts while another eligible post is available. With fewer eligible posts, the history cycle restarts sooner. History is remembered per logged-in user, or per hashed IP address for anonymous visitors, for one hour; simultaneous requests can still overlap.
 
 = Which post types are included? =
 
@@ -68,6 +68,7 @@ Building requires Node. Releasing additionally requires [WP-CLI](https://wp-cli.
 == Changelog ==
 
 = Unreleased =
+* Fixed: remaining settings-page and menu strings are available for translation; refreshed the translation template
 * Fixed: random redirects wait for late-registered post types and leave destination URLs cacheable
 * Improved: random redirects leave the request alone when no eligible post exists, its permalink cannot be resolved, or a redirect filter cancels the redirect
 * Changed: random redirects run on frontend requests only; REST and login requests no longer redirect
@@ -82,8 +83,6 @@ Building requires Node. Releasing additionally requires [WP-CLI](https://wp-cli.
 * Added: `npm run i18n:pot` and `npm run i18n:json` release steps; `npm run zip` now regenerates editor translation JSON before packaging
 
 Note: this release makes translation *possible* — it does not ship any translations. No locale is translated until a .po/.mo is contributed.
-
-Known limitation: several settings-page strings (History Size, the Usage and History sections, Clear History) are still not wrapped for translation and are absent from the .pot. That sweep is a follow-up.
 
 = 2026.07.001 =
 * Fixed: block validation error ("unexpected or invalid content") every time a post containing the Random Post Button was reopened in the editor
